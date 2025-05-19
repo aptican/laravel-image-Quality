@@ -1,0 +1,23 @@
+//// If you can add new images to the gallery on the edit page..... ////
+    public function StoreNewMultiimage(Request $request)
+    {
+        if ($request->hasFile('multi_img')) {
+            foreach ($request->file('multi_img') as $img) {
+                $name_gen = hexdec(uniqid()) . '.jpg';
+                $save_url = 'upload/property/multi-image/' . $name_gen;
+
+                // Resmi tam olarak 1300x975 boyutunda kırp ve kaydet
+                $image = Image::make($img)
+                    ->fit(1300, 975)
+                    ->encode('jpg', 50); // kalite 50
+
+                $image->save(public_path($save_url));
+
+                MultiImage::create([
+                    'property_id' => $request->imageid,
+                    'photo_name' => $save_url,
+                ]);
+            }
+        }
+        return response()->json(['success' => true, 'message' => 'Resimler başarıyla yüklendi.']);
+    }
